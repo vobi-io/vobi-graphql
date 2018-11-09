@@ -62,3 +62,14 @@ config/.env
 ./temp.js
 src/public/uploads/*
 !src/public/uploads/.gitkeep 
+
+gql
+graphql
+!gql/queries/.gitkeep
+!gql/mutations/.gitkeep
+!gql/generated/queries/.gitkeep
+!gql/generated/mutations/.gitkeep
+index_deprecated.js
+.gqlgen.json
+templates
+hbs.js
