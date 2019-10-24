@@ -23,3 +23,6 @@ vobi-graphql generate -e https://api-myid.vobi.io/graphql
 |  -d, --dir [dir] | Destination directory. Defaults to "gql" dir in working directory |
 | -g, --gen-dir [genDir] | Generated directory name inside destination directory. Defaults to "generated"  |
 
+
+
+<img src="./screenshots/demo_generator.gif" style="margin:auto"/>
