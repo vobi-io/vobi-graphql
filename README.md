@@ -10,7 +10,7 @@ npm install -g vobi-graphql
 after installing `vobi-graphql` you can generate graphql queries, mutations and Subscriptions
 
 ```
-vobi-graphql generator -e https://api-myid.vobi.io/graphql
+vobi-graphql generate -e https://api-myid.vobi.io/graphql
 ```
 
 ### `Options`

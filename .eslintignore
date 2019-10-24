@@ -1,0 +1,5 @@
+src/templates
+src/utils/helpers.js
+build/templates
+build/utils/helpers.js
+templates/

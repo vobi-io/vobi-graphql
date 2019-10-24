@@ -1,85 +1,15 @@
 #!/usr/bin/env node
 
-const program = require('commander')
-const fetch = require('isomorphic-fetch')
-const fs = require('fs')
-const { getIntrospectionQuery } = require('graphql/utilities/introspectionQuery')
-const { buildClientSchema } = require('graphql/utilities/buildClientSchema')
-const path = require('path')
-const del = require('del')
-const chalk = require('chalk')
+const program = require('commander');
+const fetch = require('isomorphic-fetch');
+const fs = require('fs');
+const { getIntrospectionQuery } = require('graphql/utilities/introspectionQuery');
+const { buildClientSchema } = require('graphql/utilities/buildClientSchema');
+const path = require('path');
+const del = require('del');
+const chalk = require('chalk');
 
-program
-  .version('0.0.1', '-v, --version')
-  .parse(process.argv)
-
-program
-  .command('generate')
-  .alias('gen')
-  .description('generate graphql queries, mutations and subscriptions from schema of given url')
-  .option('-c, --config [config]', 'Config path. Defaults to ./.gql-gen.json', './.gqlgen.json')
-  .option('-e, --endpoint [endpoint]', 'Graphql endpoint recursively')
-  .option('-s, --schema [schema]', 'Graphql schema path')
-  .option('-d, --dir [dir]', 'Destination directory. Defaults to "gql" dir in working directory', `${__dirname}/gql`)
-  .option('-g, --gen-dir [genDir]', 'Generated directory name inside destination directory. Defaults to "generated"', 'generated')
-  .parse(process.argv)
-  .action(async (options) => {
-    if (fs.existsSync(options.config)) {
-      const fileConfig = JSON.parse(fs.readFileSync(options.config, 'utf8'))
-      options = Object.assign({}, options, fileConfig)
-    }
-    if (!options.endpoint && !options.schema) {
-      console.error(chalk.red('Please provide graphql endpoint or schema'))
-      return
-    }
-    const gqlDir = options.dir
-    if (!fs.existsSync(gqlDir)) {
-      fs.mkdirSync(gqlDir)
-    }
-    const gqlGeneratedDir = `${gqlDir}/${options.genDir}`
-    del.sync(gqlGeneratedDir)
-    fs.mkdirSync(gqlGeneratedDir)
-
-    const endpoint = options.endpoint
-    const headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    }
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify({ query: getIntrospectionQuery() }),
-    })
-    const { data, errors } = await response.json()
-
-    if (errors) {
-      throw new Error(JSON.stringify(errors, null, 2))
-    }
-
-    const schema = buildClientSchema(data)
-
-    const entities = ['Mutation', 'Query', 'Subscription']
-    entities.forEach(entity => {
-      const funcName = `get${entity}Type`
-      if (schema[funcName]()) {
-        const entityInPlural = entity === 'Query'
-          ? 'queries' : `${entity.toLowerCase()}s`
-        console.log(chalk.green(`Generating ${entityInPlural}...`))
-        const dir = path.join(gqlGeneratedDir, `./${entity.toLowerCase()}`)
-        del.sync(dir)
-        fs.mkdirSync(dir)
-  
-        Object.keys(schema[funcName]().getFields()).forEach((itemType) => {
-          const { query } = generateQuery(itemType, entity, schema);
-          fs.writeFileSync(path.join(dir, `./${itemType}.gql`), query);
-        });
-        console.log(chalk.green.bold(`Done!`))
-      }
-    })
-  })
- 
-  
-const  addQueryDepthLimit = 100
+const addQueryDepthLimit = 100;
 
 function cleanName(name) {
   return name.replace(/[[\]!]/g, '');
@@ -196,5 +126,76 @@ function generateQuery(curName, curParentType, gqlSchema) {
 
   return { query, meta };
 }
+program
+  .version('0.0.1', '-v, --version')
+  .parse(process.argv);
 
-program.parse(process.argv)
+program
+  .command('generate')
+  .alias('gen')
+  .description('generate graphql queries, mutations and subscriptions from schema of given url')
+  .option('-c, --config [config]', 'Config path. Defaults to ./.gql-gen.json', './.gqlgen.json')
+  .option('-e, --endpoint [endpoint]', 'Graphql endpoint recursively')
+  .option('-s, --schema [schema]', 'Graphql schema path')
+  .option('-d, --dir [dir]', 'Destination directory. Defaults to "gql" dir in working directory', `${__dirname}/gql`)
+  .option('-g, --gen-dir [genDir]', 'Generated directory name inside destination directory. Defaults to "generated"', 'generated')
+  .parse(process.argv)
+  .action(async (params) => {
+    let options = params;
+    if (fs.existsSync(options.config)) {
+      const fileConfig = JSON.parse(fs.readFileSync(options.config, 'utf8'));
+      options = Object.assign({}, options, fileConfig);
+    }
+    if (!options.endpoint && !options.schema) {
+      console.error(chalk.red('Please provide graphql endpoint or schema'));
+      return;
+    }
+
+    const gqlDir = options.dir;
+    if (!fs.existsSync(gqlDir)) {
+      fs.mkdirSync(gqlDir);
+    }
+    const gqlGeneratedDir = `${gqlDir}/${options.genDir}`;
+    del.sync(gqlGeneratedDir);
+    fs.mkdirSync(gqlGeneratedDir);
+
+    const { endpoint } = options;
+    const headers = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    };
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ query: getIntrospectionQuery() }),
+    });
+    const { data, errors } = await response.json();
+
+    if (errors) {
+      throw new Error(JSON.stringify(errors, null, 2));
+    }
+
+    const schema = buildClientSchema(data);
+
+    const entities = ['Mutation', 'Query', 'Subscription'];
+    entities.forEach((entity) => {
+      const funcName = `get${entity}Type`;
+      if (schema[funcName]()) {
+        const entityInPlural = entity === 'Query'
+          ? 'queries' : `${entity.toLowerCase()}s`;
+        console.log(chalk.green(`Generating ${entityInPlural}...`));
+        const dir = path.join(gqlGeneratedDir, `./${entity.toLowerCase()}`);
+        del.sync(dir);
+        fs.mkdirSync(dir);
+
+        Object.keys(schema[funcName]().getFields()).forEach((itemType) => {
+          const { query } = generateQuery(itemType, entity, schema);
+          fs.writeFileSync(path.join(dir, `./${itemType}.gql`), query);
+        });
+        console.log(chalk.green.bold('Done!'));
+      }
+    });
+  });
+
+
+program.parse(process.argv);

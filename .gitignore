@@ -73,3 +73,4 @@ index_deprecated.js
 .gqlgen.json
 templates
 hbs.js
+build/

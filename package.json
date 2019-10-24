@@ -1,15 +1,25 @@
 {
   "name": "vobi-graphql",
-  "version": "1.0.4",
-  "description": "",
-  "main": "./index.js",
+  "version": "1.0.9",
+  "description": "Vobi Graphql command line tool",
+  "main": "./build/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "transpile": "npx babel --presets @babel/preset-env ./src --out-dir ./build  --plugins @babel/plugin-transform-runtime",
+    "build": "npm run lint && npm run transpile",
+    "lint": "eslint ./src",
+    "lint-fix": "eslint ./src --fix",
+    "test": "nyc mocha --require babel-core/register",
+    "prepublishOnly": "npm run build",
+    "prepare": "npm run build"
   },
-  "keywords": ["vobi-graphql", "graphql"],
+  "keywords": [
+    "vobi-graphql",
+    "graphql"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/runtime": "^7.6.3",
     "chalk": "^2.4.1",
     "commander": "^2.18.0",
     "del": "^3.0.0",
@@ -18,6 +28,23 @@
     "isomorphic-fetch": "^2.2.1"
   },
   "bin": {
-    "vobi-graphql": "./index.js"
+    "vobi-graphql": "./build/index.js"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-transform-async-to-generator": "^7.1.0",
+    "@babel/plugin-transform-runtime": "^7.1.0",
+    "@babel/polyfill": "^7.0.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-es2017": "^7.0.0-beta.53",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "eslint": "^5.6.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "mocha": "^5.2.0",
+    "mongoose-schema-jsonschema": "^1.1.15",
+    "nyc": "^13.0.1",
+    "transform-runtime": "0.0.0"
   }
 }
