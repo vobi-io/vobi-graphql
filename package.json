@@ -1,8 +1,12 @@
 {
   "name": "vobi-graphql",
-  "version": "1.0.10",
+  "version": "1.0.12",
   "description": "Vobi Graphql command line tool",
   "main": "./build/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vobi-io/vobi-graphql"
+  },
   "scripts": {
     "transpile": "npx babel --presets @babel/preset-env ./src --out-dir ./build  --plugins @babel/plugin-transform-runtime",
     "build": "npm run lint && npm run transpile",
