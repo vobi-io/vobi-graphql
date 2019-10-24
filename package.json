@@ -1,6 +1,6 @@
 {
   "name": "vobi-graphql",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Vobi Graphql command line tool",
   "main": "./build/index.js",
   "repository": {
